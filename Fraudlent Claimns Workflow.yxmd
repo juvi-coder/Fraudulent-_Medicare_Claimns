@@ -1,0 +1,1397 @@
+<?xml version="1.0"?>
+<AlteryxDocument yxmdVer="2022.3">
+  <Nodes>
+    <Node ToolID="14">
+      <GuiSettings Plugin="AlteryxGuiToolkit.TextBox.TextBox">
+        <Position x="54" y="55" width="480" height="276" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Text><![CDATA[The LEIE (List of Excluded Individuals/Entities) file contains comprehensive information about providers who have committed fraud.
+
+Each provider is uniquely identified by their National Provider Identifier (NPI).
+
+In this analysis, I am exclusively selecting the NPI column for further scrutiny using the Select tool in Alteryx.
+
+Additionally, I'm employing the Filter tool to eliminate records with an NPI Code of zero, as all medicare claims data have a unique, non-zero NPI Code to identify provider.
+
+Finally, to pinpoint the fraudulent Medicare providers in the dataset, I'm using the Unique tool in Alteryx. This process allows us to isolate and identify providers with fraudulent activity, which can be helpful to flag 🚩 fraudulent providers in the claims dataset. ]]></Text>
+          <Font name="Calibri" size="12" style="0" />
+          <TextColor name="Black" />
+          <FillColor r="255" g="255" b="217" />
+          <Shape shape="1" />
+          <Justification Justification="0" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+    </Node>
+    <Node ToolID="15">
+      <GuiSettings Plugin="AlteryxGuiToolkit.TextBox.TextBox">
+        <Position x="54" y="583" width="480" height="96" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Text>In this step, I'm utilizing the Union Tool in Alteryx to vertically stack the Medicare data files spanning the years 2012 through 2015. This process consolidates these annual datasets into a single comprehensive file for further analysis</Text>
+          <Font name="Calibri" size="12" style="0" />
+          <TextColor name="Black" />
+          <FillColor r="255" g="255" b="217" />
+          <Shape shape="1" />
+          <Justification Justification="0" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+    </Node>
+    <Node ToolID="24">
+      <GuiSettings Plugin="AlteryxGuiToolkit.TextBox.TextBox">
+        <Position x="1230" y="55" width="480" height="468" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Text>In this phase, I am merging the Fraudulent Providers Data with the Claims Data using the "NPI" Column as the key for joining.
+
+The 'J' Anchor of the Join tool in Alteryx outputs records that successfully matched from both the 'L' (Left) and 'R' (Right) inputs. These represent the fraudulent claims.
+
+The 'R' Anchor outputs records from the 'R' input that didn't find a match in the 'L' input, signifying non-fraudulent claims.
+
+I'm employing the Formula tool to create a new column named 'Fraud_Label'. Data stemming from the 'J' Anchor is assigned a label of 1 (indicating fraud), while data from the 'R' Anchor is assigned a label of 0 (indicating non-fraud).
+
+Next, I use the Union tool to combine both sets of labeled data. This is followed by removing any duplicate rows that may have been created due to the join operation.
+
+In my dataset, multiple claims are associated with the same provider. However, for my analysis, I only require a single row per provider. To achieve this, I'm selecting unique rows based on the combination of 'NPI' and 'HCPCS' codes.</Text>
+          <Font name="Calibri" size="12" style="0" />
+          <TextColor name="Black" />
+          <FillColor r="255" g="255" b="217" />
+          <Shape shape="1" />
+          <Justification Justification="0" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+    </Node>
+    <Node ToolID="33">
+      <GuiSettings Plugin="AlteryxGuiToolkit.TextBox.TextBox">
+        <Position x="1890" y="847" width="480" height="1308" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Text><![CDATA[The whole point of feature engineering is to capture the abnormal behavior that an medicare provider may commit. After an literature study, I found that these are important variables in the data set that can capture abnormalities.
+
+Using the variables
+ 
+Average Medicare Amount Allowed: 
+Average of the Medicare allowed amount for the service; this figure is the sum of the amount Medicare pays, the deductible and coinsurance amounts that the beneficiary is responsible for paying, and any amounts that a third party is responsible for paying.
+
+Average Medicare Payment Amount:	Average amount that Medicare paid after deductible and coinsurance amounts have been deducted for the line item service.
+
+Average Submitted Charge Amount:	Average of the charges that the provider submitted for the service.
+
+Number of Medicare Beneficiary/Day Services	Number of distinct Medicare beneficiary/per day services.
+
+I created the following features:
+
+total_amount_claimed
+[Number of Medicare Beneficiary/Day Services]*[Average Submitted Charge Amount]
+This captures the total amount of money charged by the provider for all the services that were performed and submitted for claim.
+
+Total_amount_recevied
+[Number of Medicare Beneficiary/Day Services]*[Average Medicare Payment Amount]
+This captures the total average amount received by the provider that medicare paid after deductible  and coinsurance amounts.
+
+total_amount_allowed
+[Number of Medicare Beneficiary/Day Services]*[Average Medicare Allowed Amount]
+This captures the total average amount approved and covered by Medicare for the service.
+
+Using the above features I again created the below features:
+
+final_amount_recevied
+[total_amount_claimed]-[Total_amount_recevied]
+This captures the total amount recevied by the medicare provider after the copayment and dedcutiable payed by the patient
+
+excess_amount_claimed
+[total_amount_claimed]-[total_amount_allowed]
+This captures the excess amount claimed to the approved medicare costs 
+
+payout_ratio
+[Average Medicare Payment Amount]/[Average Submitted Charge Amount]
+This feature captures the total of average amount paid by the medicare to the total average cost of services for a claim by provider
+
+allowance_ratio
+[Average Medicare Allowed Amount]/[Average Submitted Charge Amount]
+This captures average  deviation in the amount approved by medicare and the total amount charged by the provider. 
+
+]]></Text>
+          <Font name="Calibri" size="12" style="0" />
+          <TextColor name="Black" />
+          <FillColor r="241" g="124" b="103" />
+          <Shape shape="1" />
+          <Justification Justification="0" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+    </Node>
+    <Node ToolID="37">
+      <GuiSettings Plugin="AlteryxGuiToolkit.TextBox.TextBox">
+        <Position x="2454" y="751" width="480" height="876" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Text>In this stage, I am grouping data by NPI Code, Gender, Provider Type, and Fraud Label to consolidate all data related to each unique provider.
+
+The final features for model construction, derived from multiple claim rows per provider, are as follows:
+
+Count of HCPCS Code: This reflects the diversity of services provided by each provider. Larger providers may offer a variety of services, while smaller ones might only provide a few. This feature could highlight abnormalities in the model, such as smaller providers attempting to claim large amounts.
+
+Average of Payout Ratio: This measures the average ratio of the amount paid by Medicare to the amount charged by the provider. It can help identify abnormalities.
+
+Average of Allowance Ratio: This feature represents the average ratio of the amount approved by Medicare to the amount charged by the provider.
+
+Average of Final_amount_received: This captures the average amount received by the provider from Medicare. It can highlight anomalies such as unusually high or low reimbursement rates.
+
+Average of Excess_amount_claimed: This measures the average excess amount claimed by the provider, which can help in detecting abnormalities.
+
+Average of Medicare Beneficiary/Day Services: This captures the average number of patients a single provider serves per day. Abnormally high values could suggest fraudulent activity.
+
+Sum of Total_Amount_Claimed
+
+Sum of Total_amount_received
+
+Sum of Total_amount_allowed
+
+The above features will assist in the development of a model aimed at identifying fraudulent Medicare claims. By effectively distinguishing between normal and abnormal provider behavior, this model can help ensure Medicare funds are used appropriately and efficiently.</Text>
+          <Font name="Calibri" size="12" style="0" />
+          <TextColor name="Black" />
+          <FillColor r="241" g="124" b="103" />
+          <Shape shape="1" />
+          <Justification Justification="0" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+    </Node>
+    <Node ToolID="36">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="2513" y="485" width="361" height="249" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Final Data for EDA and Modeling</Caption>
+          <Style TextColor="#314c4a" FillColor="#dfffff" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="35">
+          <GuiSettings Plugin="AlteryxSpatialPluginsGui.Summarize.Summarize">
+            <Position x="2538" y="594" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <SummarizeFields>
+                <SummarizeField field="National Provider Identifier" action="GroupBy" rename="National Provider Identifier" />
+                <SummarizeField field="Gender" action="GroupBy" rename="Gender" />
+                <SummarizeField field="Provider Type" action="GroupBy" rename="Provider Type" />
+                <SummarizeField field="HCPCS Code" action="Count" rename="Count_HCPCS" />
+                <SummarizeField field="payout_ratio" action="Avg" rename="Avg_payout_ratio" />
+                <SummarizeField field="allowance_ratio" action="Avg" rename="Avg_allowance_ratio" />
+                <SummarizeField field="final_amount_recevied" action="Avg" rename="Avg_final_amount_recevied" />
+                <SummarizeField field="excess_amount_claimed" action="Avg" rename="Avg_excess_amount_claimed" />
+                <SummarizeField field="Number of Medicare Beneficiary/Day Services" action="Avg" rename="Avg_Number of Medicare Beneficiary/Day Services" />
+                <SummarizeField field="total_amount_claimed" action="Sum" rename="Sum_total_amount_claimed" />
+                <SummarizeField field="Total_amount_recevied" action="Sum" rename="Sum_Total_amount_recevied" />
+                <SummarizeField field="total_amount_allowed" action="Sum" rename="Sum_total_amount_allowed" />
+                <SummarizeField field="Fraud_Label" action="GroupBy" rename="Fraud_Label" />
+              </SummarizeFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxSpatialPluginsEngine.dll" EngineDllEntryPoint="AlteryxSummarize" />
+        </Node>
+        <Node ToolID="38">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2634" y="534" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>C:\Users\Killer\AppData\Local\Temp\Engine_14084_2e09c92a942f184787f714a7a3692971_\Engine_14084_262b4656890fed419e5813917155d50d~.yxdb</TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profile</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="70">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileOutput.DbFileOutput">
+            <Position x="2658" y="618" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <File FileFormat="19" MaxRecords="">C:\Users\Killer\Desktop\Fraudulent Claimns Problem\FInal Dataset.yxdb</File>
+              <Passwords />
+              <Disable>False</Disable>
+              <FormatSpecificOptions>
+                <NoSpatialIndex>False</NoSpatialIndex>
+                <SaveSource>True</SaveSource>
+                <WriteCompatibleVersion>False</WriteCompatibleVersion>
+              </FormatSpecificOptions>
+              <MultiFile value="False" />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>FInal Dataset.yxdb</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+            <Dependencies>
+              <Implicit />
+            </Dependencies>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileOutput" />
+        </Node>
+        <Node ToolID="72">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+            <Position x="2742" y="594" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <OrderChanged value="False" />
+              <CommaDecimal value="False" />
+              <SelectFields>
+                <SelectField field="Count_HCPCS" selected="True" type="Float" size="4" />
+                <SelectField field="Avg_payout_ratio" selected="True" type="Float" size="4" />
+                <SelectField field="Avg_allowance_ratio" selected="True" type="Float" size="4" />
+                <SelectField field="Avg_final_amount_recevied" selected="True" type="Float" size="4" />
+                <SelectField field="Avg_excess_amount_claimed" selected="True" type="Float" size="4" />
+                <SelectField field="Avg_Number of Medicare Beneficiary/Day Services" selected="True" type="Float" size="4" />
+                <SelectField field="Sum_total_amount_claimed" selected="True" type="Float" size="4" />
+                <SelectField field="Sum_Total_amount_recevied" selected="True" type="Float" size="4" />
+                <SelectField field="Sum_total_amount_allowed" selected="True" type="Float" size="4" />
+                <SelectField field="*Unknown" selected="True" />
+              </SelectFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+        </Node>
+        <Node ToolID="73">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2790" y="558" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>C:\Users\Killer\AppData\Local\Temp\Engine_14084_2e09c92a942f184787f714a7a3692971_\Engine_14084_f6ce24f1e18b3343a1cc435a9cafec70~.yxdb</TempFile>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+      </ChildNodes>
+    </Node>
+    <Node ToolID="32">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="1889" y="593" width="193" height="226" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption><![CDATA[Feature Engineering ]]></Caption>
+          <Style TextColor="#314c4a" FillColor="#f17c67" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="31">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Formula.Formula">
+            <Position x="1914" y="643" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <FormulaFields>
+                <FormulaField expression="[Number of Medicare Beneficiary/Day Services]*[Average Submitted Charge Amount]" field="total_amount_claimed" size="4" type="Float" />
+                <FormulaField expression="[Number of Medicare Beneficiary/Day Services]*[Average Medicare Payment Amount]" field="Total_amount_recevied" size="4" type="Float" />
+                <FormulaField expression="[Number of Medicare Beneficiary/Day Services]*[Average Medicare Allowed Amount]" field="total_amount_allowed" size="4" type="Float" />
+                <FormulaField expression="[Average Medicare Payment Amount]/[Average Submitted Charge Amount]" field="payout_ratio" size="4" type="Float" />
+                <FormulaField expression="[Average Medicare Allowed Amount]/[Average Submitted Charge Amount]" field="allowance_ratio" size="4" type="Float" />
+                <FormulaField expression="[total_amount_claimed]-[Total_amount_recevied]" field="final_amount_recevied" size="4" type="Float" />
+                <FormulaField expression="[total_amount_claimed]-[total_amount_allowed]" field="excess_amount_claimed" size="4" type="Float" />
+              </FormulaFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>total_amount_claimed = [Number of Medicare Beneficiary/Day Services]*[Average Su...</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFormula" />
+        </Node>
+        <Node ToolID="74">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+            <Position x="1998" y="642" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <OrderChanged value="False" />
+              <CommaDecimal value="False" />
+              <SelectFields>
+                <SelectField field="*Unknown" selected="True" />
+              </SelectFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+        </Node>
+      </ChildNodes>
+    </Node>
+    <Node ToolID="8">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="557" y="401" width="361" height="466" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Medicare Data Input</Caption>
+          <Style TextColor="#314c4a" FillColor="#ffffd9" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="2">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+            <Position x="582" y="655" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Passwords />
+              <File RecordLimit="" SearchSubDirs="False" FileFormat="0" OutputFileName="">C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv</File>
+              <FormatSpecificOptions>
+                <HeaderRow>True</HeaderRow>
+                <IgnoreErrors>False</IgnoreErrors>
+                <AllowShareWrite>False</AllowShareWrite>
+                <ImportLine>1</ImportLine>
+                <FieldLen>254</FieldLen>
+                <SingleThreadRead>False</SingleThreadRead>
+                <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
+                <Delimeter>,</Delimeter>
+                <QuoteRecordBreak>False</QuoteRecordBreak>
+                <CodePage>28591</CodePage>
+              </FormatSpecificOptions>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>CMS_CY2014_R.csv</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output">
+              <RecordInfo>
+                <Field name="National Provider Identifier" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Gender" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Provider Type" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Count_HCPCS" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Avg_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Min_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Max_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Avg_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Min_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Max_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_claimed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_paid" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_allowed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Avg_Number of Medicare Beneficiary/Day Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Avg_Number of Medicare Beneficiaries" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Avg_Final_amount_received" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Avg_Excess_amount_claimed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Fraud_Label" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Right_National Provider Identifier" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Last Name/Organization Name of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="First Name of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Middle Initial of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Credentials of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Gender of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Entity Type of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Street Address 1 of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Street Address 2 of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="City of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Zip Code of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="State Code of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Country Code of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Provider Type of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Medicare Participation Indicator" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Place of Service" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="HCPCS Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="HCPCS Description" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Identifies HCPCS As Drug Included in the ASP Drug List" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Number of Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Number of Medicare Beneficiaries" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Number of Distinct Medicare Beneficiary/Per Day Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Average Medicare Allowed Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Average Submitted Charge Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Average Medicare Payment Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+                <Field name="Average Medicare Standardized Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2014_R.csv" type="V_String" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+        </Node>
+        <Node ToolID="3">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+            <Position x="582" y="751" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Passwords />
+              <File RecordLimit="" SearchSubDirs="False" FileFormat="0" OutputFileName="">C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv</File>
+              <FormatSpecificOptions>
+                <HeaderRow>True</HeaderRow>
+                <IgnoreErrors>False</IgnoreErrors>
+                <AllowShareWrite>False</AllowShareWrite>
+                <ImportLine>1</ImportLine>
+                <FieldLen>254</FieldLen>
+                <SingleThreadRead>False</SingleThreadRead>
+                <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
+                <Delimeter>,</Delimeter>
+                <QuoteRecordBreak>False</QuoteRecordBreak>
+                <CodePage>28591</CodePage>
+              </FormatSpecificOptions>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>CMS_CY2015_R.csv</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output">
+              <RecordInfo>
+                <Field name="National Provider Identifier" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Gender" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Provider Type" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Count_HCPCS" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Avg_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Min_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Max_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Avg_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Min_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Max_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_claimed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_paid" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_allowed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Avg_Number of Medicare Beneficiary/Day Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Avg_Number of Medicare Beneficiaries" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Avg_Final_amount_received" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Avg_Excess_amount_claimed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Fraud_Label" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Right_National Provider Identifier" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Last Name/Organization Name of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="First Name of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Middle Initial of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Credentials of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Gender of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Entity Type of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Street Address 1 of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Street Address 2 of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="City of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Zip Code of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="State Code of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Country Code of the Provider" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Right_Provider Type" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Medicare Participation Indicator" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Place of Service" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="HCPCS Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="HCPCS Description" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="HCPCS Drug Indicator" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Number of Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Number of Medicare Beneficiaries" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Number of Distinct Medicare Beneficiary/Per Day Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Average Medicare Allowed Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Average Submitted Charge Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Average Medicare Payment Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+                <Field name="Average Medicare Standardized Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2015_R.csv" type="V_String" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+        </Node>
+        <Node ToolID="5">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+            <Position x="582" y="450" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Passwords />
+              <File RecordLimit="" SearchSubDirs="False" FileFormat="0" OutputFileName="">C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv</File>
+              <FormatSpecificOptions>
+                <HeaderRow>True</HeaderRow>
+                <IgnoreErrors>False</IgnoreErrors>
+                <AllowShareWrite>False</AllowShareWrite>
+                <ImportLine>1</ImportLine>
+                <FieldLen>254</FieldLen>
+                <SingleThreadRead>False</SingleThreadRead>
+                <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
+                <Delimeter>,</Delimeter>
+                <QuoteRecordBreak>False</QuoteRecordBreak>
+                <CodePage>28591</CodePage>
+              </FormatSpecificOptions>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>CMS_CY2012_R.csv</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output">
+              <RecordInfo>
+                <Field name="National Provider Identifier" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Gender" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Provider Type" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Count_HCPCS" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Avg_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Min_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Max_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Avg_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Min_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Max_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_claimed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_paid" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_allowed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Avg_Number of Medicare Beneficiary/Day Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Avg_Number of Medicare Beneficiaries" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Avg_Final_amount_received" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Avg_Excess_amount_claimed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Fraud_Label" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Right_National Provider Identifier" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Last Name/Organization Name" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="First Name" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Middle Initial" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Credentials" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Right_Gender" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Entity Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Street Address 1" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Street Address 2" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="City" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Zip Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="State Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Country Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Right_Provider Type" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Medicare Participation" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Place of Service" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="HCPCS Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="HCPCS Description" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="HCPCS Drug Indicator" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Number of Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Number of Medicare Beneficiaries" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Number of Medicare Beneficiary/Day Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Average Medicare Allowed Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Standard Deviation of Medicare Allowed Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Average Submitted Charge Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Standard Deviation of Submitted Charge Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Average Medicare Payment Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+                <Field name="Standard Deviation of Medicare Payment Amount" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2012_R.csv" type="V_String" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+        </Node>
+        <Node ToolID="6">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+            <Position x="582" y="559" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Passwords />
+              <File RecordLimit="" SearchSubDirs="False" FileFormat="0" OutputFileName="">C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv</File>
+              <FormatSpecificOptions>
+                <HeaderRow>True</HeaderRow>
+                <IgnoreErrors>False</IgnoreErrors>
+                <AllowShareWrite>False</AllowShareWrite>
+                <ImportLine>1</ImportLine>
+                <FieldLen>254</FieldLen>
+                <SingleThreadRead>False</SingleThreadRead>
+                <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
+                <Delimeter>,</Delimeter>
+                <QuoteRecordBreak>False</QuoteRecordBreak>
+                <CodePage>28591</CodePage>
+              </FormatSpecificOptions>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>CMS_CY2013_R.csv</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output">
+              <RecordInfo>
+                <Field name="National Provider Identifier" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Gender" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Provider Type" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Count_HCPCS" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Avg_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Min_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Max_Payout_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Avg_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Min_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Max_Allowance_Ratio" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_claimed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_paid" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Sum_Total_amount_allowed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Avg_Number of Medicare Beneficiary/Day Services" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Avg_Number of Medicare Beneficiaries" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Avg_Final_amount_received" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Avg_Excess_amount_claimed" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Fraud_Label" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Right_National Provider Identifier" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Last Name/Organization Name" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="First Name" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Middle Initial" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Credentials" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Right_Gender" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Entity Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Street Address 1" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Street Address 2" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="City" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Zip Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="State Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Country Code" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Right_Provider Type" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Medicare Participation" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="Place of Service" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="HCPCS_CODE" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="HCPCS_DESCRIPTION" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="HCPCS_DRUG_INDICATOR" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="LINE_SRVC_CNT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="BENE_UNIQUE_CNT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="BENE_DAY_SRVC_CNT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="AVERAGE_MEDICARE_ALLOWED_AMT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="STDEV_MEDICARE_ALLOWED_AMT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="AVERAGE_SUBMITTED_CHRG_AMT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="STDEV_SUBMITTED_CHRG_AMT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="AVERAGE_MEDICARE_PAYMENT_AMT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+                <Field name="STDEV_MEDICARE_PAYMENT_AMT" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\CMS_CY2013_R.csv" type="V_String" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+        </Node>
+        <Node ToolID="13">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Union.Union">
+            <Position x="822" y="655" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <ByName_ErrorMode>Warning</ByName_ErrorMode>
+              <ByName_OutputMode>All</ByName_OutputMode>
+              <Mode>ByName</Mode>
+              <SetOutputOrder value="False" />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxUnion" />
+        </Node>
+        <Node ToolID="16">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="834" y="571" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Layout>
+                <View1>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+              </Layout>
+              <TempFile>C:\Users\Killer\AppData\Local\Temp\Engine_14084_2e09c92a942f184787f714a7a3692971_\Engine_14084_a14f38a10d3f2741939bd2cabb1ec6eb~.yxdb</TempFile>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+      </ChildNodes>
+    </Node>
+    <Node ToolID="23">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="1145" y="546" width="685" height="269" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Identifying Fraudulent Medicare Data</Caption>
+          <Style TextColor="#314c4a" FillColor="#ffffd9" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="17">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Join.Join">
+            <Position x="1170" y="655" />
+          </GuiSettings>
+          <Properties>
+            <Configuration joinByRecordPos="False">
+              <JoinInfo connection="Left">
+                <Field field="NPI" />
+              </JoinInfo>
+              <JoinInfo connection="Right">
+                <Field field="National Provider Identifier" />
+              </JoinInfo>
+              <SelectConfiguration>
+                <Configuration outputConnection="Join">
+                  <OrderChanged value="False" />
+                  <CommaDecimal value="False" />
+                  <SelectFields>
+                    <SelectField field="*Unknown" selected="True" />
+                  </SelectFields>
+                </Configuration>
+              </SelectConfiguration>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxJoin" />
+        </Node>
+        <Node ToolID="18">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Formula.Formula">
+            <Position x="1266" y="595" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <FormulaFields>
+                <FormulaField expression="1" field="Fraud_Label" size="254" type="V_String" />
+              </FormulaFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText><![CDATA[Fraud_Label = 1
+]]></DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFormula" />
+        </Node>
+        <Node ToolID="19">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Formula.Formula">
+            <Position x="1266" y="715" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <FormulaFields>
+                <FormulaField expression="0" field="Fraud_Label" size="254" type="V_String" />
+              </FormulaFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText><![CDATA[Fraud_Label = 0
+]]></DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFormula" />
+        </Node>
+        <Node ToolID="20">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Union.Union">
+            <Position x="1374" y="643" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <ByName_ErrorMode>Warning</ByName_ErrorMode>
+              <ByName_OutputMode>All</ByName_OutputMode>
+              <Mode>ByName</Mode>
+              <SetOutputOrder value="False" />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxUnion" />
+        </Node>
+        <Node ToolID="21">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+            <Position x="1458" y="643" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <OrderChanged value="True" />
+              <CommaDecimal value="False" />
+              <SelectFields>
+                <SelectField field="Average Medicare Allowed Amount" selected="True" type="Float" size="4" />
+                <SelectField field="Average Medicare Payment Amount" selected="True" type="Float" size="4" />
+                <SelectField field="Average Medicare Standardized Amount" selected="False" />
+                <SelectField field="Average Submitted Charge Amount" selected="True" type="Float" size="4" />
+                <SelectField field="AVERAGE_MEDICARE_ALLOWED_AMT" selected="False" type="Int64" size="8" />
+                <SelectField field="AVERAGE_MEDICARE_PAYMENT_AMT" selected="False" />
+                <SelectField field="AVERAGE_SUBMITTED_CHRG_AMT" selected="False" />
+                <SelectField field="Avg_Allowance_Ratio" selected="False" />
+                <SelectField field="Avg_Excess_amount_claimed" selected="False" />
+                <SelectField field="Avg_Final_amount_received" selected="False" />
+                <SelectField field="Avg_Number of Medicare Beneficiaries" selected="False" />
+                <SelectField field="Avg_Number of Medicare Beneficiary/Day Services" selected="False" />
+                <SelectField field="Avg_Payout_Ratio" selected="False" />
+                <SelectField field="BENE_DAY_SRVC_CNT" selected="False" />
+                <SelectField field="BENE_UNIQUE_CNT" selected="False" />
+                <SelectField field="City" selected="True" />
+                <SelectField field="City of the Provider" selected="False" />
+                <SelectField field="Count_HCPCS" selected="False" />
+                <SelectField field="Country Code" selected="True" />
+                <SelectField field="Country Code of the Provider" selected="False" />
+                <SelectField field="Credentials" selected="True" />
+                <SelectField field="Credentials of the Provider" selected="False" />
+                <SelectField field="Entity Code" selected="True" />
+                <SelectField field="Entity Type of the Provider" selected="False" />
+                <SelectField field="First Name" selected="True" />
+                <SelectField field="First Name of the Provider" selected="False" />
+                <SelectField field="Fraud_Label" selected="True" />
+                <SelectField field="Gender" selected="True" />
+                <SelectField field="Gender of the Provider" selected="False" />
+                <SelectField field="HCPCS Code" selected="True" />
+                <SelectField field="HCPCS Description" selected="True" />
+                <SelectField field="HCPCS Drug Indicator" selected="True" />
+                <SelectField field="HCPCS_CODE" selected="False" />
+                <SelectField field="HCPCS_DESCRIPTION" selected="False" />
+                <SelectField field="HCPCS_DRUG_INDICATOR" selected="False" />
+                <SelectField field="Identifies HCPCS As Drug Included in the ASP Drug List" selected="False" />
+                <SelectField field="Last Name/Organization Name" selected="True" />
+                <SelectField field="Last Name/Organization Name of the Provider" selected="False" />
+                <SelectField field="LINE_SRVC_CNT" selected="False" />
+                <SelectField field="Max_Allowance_Ratio" selected="False" />
+                <SelectField field="Max_Payout_Ratio" selected="False" />
+                <SelectField field="Medicare Participation" selected="True" />
+                <SelectField field="Medicare Participation Indicator" selected="False" />
+                <SelectField field="Middle Initial" selected="True" />
+                <SelectField field="Middle Initial of the Provider" selected="False" />
+                <SelectField field="Min_Allowance_Ratio" selected="False" />
+                <SelectField field="Min_Payout_Ratio" selected="False" />
+                <SelectField field="National Provider Identifier" selected="True" />
+                <SelectField field="NPI" selected="False" />
+                <SelectField field="Number of Distinct Medicare Beneficiary/Per Day Services" selected="False" type="Float" size="4" />
+                <SelectField field="Number of Medicare Beneficiaries" selected="True" type="Float" size="4" />
+                <SelectField field="Number of Medicare Beneficiary/Day Services" selected="True" type="Float" size="4" />
+                <SelectField field="Number of Services" selected="True" type="Float" size="4" />
+                <SelectField field="Place of Service" selected="True" type="Float" size="4" />
+                <SelectField field="Provider Type" selected="True" />
+                <SelectField field="Provider Type of the Provider" selected="False" />
+                <SelectField field="Right_Gender" selected="False" />
+                <SelectField field="Right_National Provider Identifier" selected="True" />
+                <SelectField field="Right_Provider Type" selected="False" />
+                <SelectField field="Standard Deviation of Medicare Allowed Amount" selected="True" type="Float" size="4" />
+                <SelectField field="Standard Deviation of Medicare Payment Amount" selected="True" type="Float" size="4" />
+                <SelectField field="Standard Deviation of Submitted Charge Amount" selected="True" type="Float" size="4" />
+                <SelectField field="State Code" selected="True" />
+                <SelectField field="State Code of the Provider" selected="False" />
+                <SelectField field="STDEV_MEDICARE_ALLOWED_AMT" selected="False" />
+                <SelectField field="STDEV_MEDICARE_PAYMENT_AMT" selected="False" />
+                <SelectField field="STDEV_SUBMITTED_CHRG_AMT" selected="False" />
+                <SelectField field="Street Address 1" selected="True" />
+                <SelectField field="Street Address 1 of the Provider" selected="False" />
+                <SelectField field="Street Address 2" selected="True" />
+                <SelectField field="Street Address 2 of the Provider" selected="False" />
+                <SelectField field="Sum_Total_amount_allowed" selected="False" />
+                <SelectField field="Sum_Total_amount_claimed" selected="False" />
+                <SelectField field="Sum_Total_amount_paid" selected="False" />
+                <SelectField field="Zip Code" selected="True" />
+                <SelectField field="Zip Code of the Provider" selected="False" />
+                <SelectField field="*Unknown" selected="False" />
+              </SelectFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+        </Node>
+        <Node ToolID="22">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Filter.Filter">
+            <Position x="1542" y="643" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Expression>!IsNull([Last Name/Organization Name]) AND !IsNull([HCPCS Code])</Expression>
+              <Mode>Custom</Mode>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>!IsNull([Last Name/Organization Name]) AND !IsNull([HCPCS Code])</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFilter" />
+        </Node>
+        <Node ToolID="25">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1614" y="595" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>C:\Users\Killer\AppData\Local\Temp\Engine_14084_2e09c92a942f184787f714a7a3692971_\Engine_14084_64887e84c34b6f46a01cba52fce0b99b~.yxdb</TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profile</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="27">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Unique.Unique">
+            <Position x="1686" y="631" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <UniqueFields>
+                <Field field="HCPCS Code" />
+                <Field field="National Provider Identifier" />
+              </UniqueFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxUnique" />
+        </Node>
+        <Node ToolID="30">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1746" y="595" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>C:\Users\Killer\AppData\Local\Temp\Engine_14084_2e09c92a942f184787f714a7a3692971_\Engine_14084_7f724673f1e0124aad28b6755d85b26d~.yxdb</TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profile</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+      </ChildNodes>
+    </Node>
+    <Node ToolID="7">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="545" y="54" width="481" height="197" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Fraud Data Input</Caption>
+          <Style TextColor="#314c4a" FillColor="#ffffd9" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="4">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+            <Position x="570" y="150" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Passwords />
+              <File RecordLimit="" SearchSubDirs="False" FileFormat="0" OutputFileName="">C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv</File>
+              <FormatSpecificOptions>
+                <HeaderRow>True</HeaderRow>
+                <IgnoreErrors>False</IgnoreErrors>
+                <AllowShareWrite>False</AllowShareWrite>
+                <ImportLine>1</ImportLine>
+                <FieldLen>254</FieldLen>
+                <SingleThreadRead>False</SingleThreadRead>
+                <IgnoreQuotes>DoubleQuotes</IgnoreQuotes>
+                <Delimeter>,</Delimeter>
+                <QuoteRecordBreak>False</QuoteRecordBreak>
+                <CodePage>28591</CodePage>
+              </FormatSpecificOptions>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>LIEIE_File.csv</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output">
+              <RecordInfo>
+                <Field name="LASTNAME" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="FIRSTNAME" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="MIDNAME" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="BUSNAME" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="GENERAL" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="SPECIALTY" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="UPIN" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="NPI" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="DOB" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="ADDRESS" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="CITY" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="STATE" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="ZIP" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="EXCLTYPE" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="EXCLDATE" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="REINDATE" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="WAIVERDATE" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+                <Field name="WVRSTATE" size="254" source="File: C:\Users\Killer\Desktop\Fraudulent Claimns Problem\LIEIE_File.csv" type="V_String" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+        </Node>
+        <Node ToolID="9">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+            <Position x="678" y="151" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <OrderChanged value="False" />
+              <CommaDecimal value="False" />
+              <SelectFields>
+                <SelectField field="NPI" selected="True" />
+                <SelectField field="*Unknown" selected="False" />
+              </SelectFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+        </Node>
+        <Node ToolID="10">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Filter.Filter">
+            <Position x="750" y="151" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Mode>Simple</Mode>
+              <Simple>
+                <Operator>!=</Operator>
+                <Field>NPI</Field>
+                <Operands>
+                  <IgnoreTimeInDateTime>True</IgnoreTimeInDateTime>
+                  <DateType>fixed</DateType>
+                  <PeriodDate>2023-05-13 11:54:09</PeriodDate>
+                  <PeriodType>
+                  </PeriodType>
+                  <PeriodCount>0</PeriodCount>
+                  <StartDate>2023-05-13 11:54:09</StartDate>
+                  <EndDate>2023-05-13 11:54:09</EndDate>
+                  <Operand>0</Operand>
+                </Operands>
+              </Simple>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>[NPI] != "0"</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFilter" />
+        </Node>
+        <Node ToolID="11">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Unique.Unique">
+            <Position x="858" y="151" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <UniqueFields>
+                <Field field="NPI" />
+              </UniqueFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxUnique" />
+        </Node>
+        <Node ToolID="12">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="942" y="103" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>C:\Users\Killer\AppData\Local\Temp\Engine_14084_2e09c92a942f184787f714a7a3692971_\Engine_14084_d24e4fe077d382438e0efa0977bd876c~.yxdb</TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profile</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+      </ChildNodes>
+    </Node>
+  </Nodes>
+  <Connections>
+    <Connection>
+      <Origin ToolID="35" Connection="Output" />
+      <Destination ToolID="38" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="35" Connection="Output" />
+      <Destination ToolID="70" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="35" Connection="Output" />
+      <Destination ToolID="72" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="72" Connection="Output" />
+      <Destination ToolID="73" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="31" Connection="Output" />
+      <Destination ToolID="74" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="74" Connection="Output" />
+      <Destination ToolID="35" Connection="Input" />
+    </Connection>
+    <Connection name="#1">
+      <Origin ToolID="2" Connection="Output" />
+      <Destination ToolID="13" Connection="Input" />
+    </Connection>
+    <Connection name="#4">
+      <Origin ToolID="3" Connection="Output" />
+      <Destination ToolID="13" Connection="Input" />
+    </Connection>
+    <Connection name="#3">
+      <Origin ToolID="5" Connection="Output" />
+      <Destination ToolID="13" Connection="Input" />
+    </Connection>
+    <Connection name="#2">
+      <Origin ToolID="6" Connection="Output" />
+      <Destination ToolID="13" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="13" Connection="Output" />
+      <Destination ToolID="16" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="13" Connection="Output" />
+      <Destination ToolID="17" Connection="Right" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="11" Connection="Unique" />
+      <Destination ToolID="17" Connection="Left" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="17" Connection="Right" />
+      <Destination ToolID="19" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="17" Connection="Join" />
+      <Destination ToolID="18" Connection="Input" />
+    </Connection>
+    <Connection name="#1">
+      <Origin ToolID="18" Connection="Output" />
+      <Destination ToolID="20" Connection="Input" />
+    </Connection>
+    <Connection name="#2">
+      <Origin ToolID="19" Connection="Output" />
+      <Destination ToolID="20" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="20" Connection="Output" />
+      <Destination ToolID="21" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="21" Connection="Output" />
+      <Destination ToolID="22" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="22" Connection="True" />
+      <Destination ToolID="25" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="22" Connection="True" />
+      <Destination ToolID="27" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="27" Connection="Unique" />
+      <Destination ToolID="30" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="27" Connection="Unique" />
+      <Destination ToolID="31" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="Output" />
+      <Destination ToolID="9" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="9" Connection="Output" />
+      <Destination ToolID="10" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="10" Connection="True" />
+      <Destination ToolID="11" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="11" Connection="Unique" />
+      <Destination ToolID="12" Connection="Input" />
+    </Connection>
+  </Connections>
+  <Properties>
+    <Memory default="True" />
+    <GlobalRecordLimit value="0" />
+    <TempFiles default="True" />
+    <Annotation on="True" includeToolName="False" />
+    <ConvErrorLimit value="10" />
+    <ConvErrorLimit_Stop value="False" />
+    <CancelOnError value="False" />
+    <DisableBrowse value="False" />
+    <EnablePerformanceProfiling value="False" />
+    <RunWithE2 value="True" />
+    <PredictiveToolsCodePage value="1252" />
+    <DisableAllOutput value="False" />
+    <ShowAllMacroMessages value="False" />
+    <ShowConnectionStatusIsOn value="True" />
+    <ShowConnectionStatusOnlyWhenRunning value="True" />
+    <ZoomLevel value="0" />
+    <LayoutType>Horizontal</LayoutType>
+    <MetaInfo>
+      <NameIsFileName value="True" />
+      <Name>Fraudlent Claimns Workflow</Name>
+      <Description />
+      <RootToolName />
+      <ToolVersion />
+      <ToolInDb value="False" />
+      <CategoryName />
+      <SearchTags />
+      <Author />
+      <Company />
+      <Copyright />
+      <DescriptionLink actual="" displayed="" />
+      <Example>
+        <Description />
+        <File />
+      </Example>
+      <WorkflowId value="3340f141-9fa8-4bc0-a05f-6738f6ad9bb1" />
+      <Telemetry>
+        <PreviousWorkflowId value="fc2ee62c-091f-4c06-ab07-b8e37e4fea95" />
+        <OriginWorkflowId value="df1045ba-c5df-4655-9c72-443d84f3758c" />
+      </Telemetry>
+    </MetaInfo>
+    <Events>
+      <Enabled value="True" />
+    </Events>
+  </Properties>
+</AlteryxDocument>
