@@ -30,41 +30,111 @@ The Office of the Inspector General provides a dataset of List of Excluded Indiv
 
 **Using the above two datasets, levraging the power of Altreyx, Tableau and Python**, **I have built an Gradient Boosted Model, with 76% Accuracy and 71% AUC Scores.**
 
-## DATA PREP Workflow
+# DATA PREP Workflow
 <img width="943" alt="Data Prep Workflow" src="https://github.com/juvi-coder/Fraudulent-_Medicare_Claimns/assets/100660932/3bfc4aff-cd14-42fc-9502-127a4c1ceaf6">
 
-**Looking into each step**:
+
+
+
+# Looking into each step of Data Prep Workflow
+
 <img width="581" alt="Dataprep_fraud" src="https://github.com/juvi-coder/Fraudulent-_Medicare_Claimns/assets/100660932/690f72aa-f93e-40c1-9fc1-a4a28b448439">
 
-
-**Fraud Data Input LEIE**
-The LEIE (List of Excluded Individuals/Entities) file contains comprehensive information about providers who have committed fraud.
-
-Each provider is uniquely identified by their National Provider Identifier (NPI).
-
-In this analysis, I am exclusively selecting the NPI column for further scrutiny using the Select tool in Alteryx.
-
-Additionally, I'm employing the Filter tool to eliminate records with an NPI Code of zero, as all medicare claims data have a unique, non-zero NPI Code to identify provider.
-
-Finally, to pinpoint the fraudulent Medicare providers in the dataset, I'm using the Unique tool in Alteryx. This process allows us to isolate and identify providers with fraudulent activity, which can be helpful to flag 🚩 fraudulent providers in the claims dataset. 
-
-**Medicare Data Input**
-In this step, I'm utilizing the Union Tool in Alteryx to vertically stack the Medicare data files spanning the years 2012 through 2015. This process consolidates these annual datasets into a single comprehensive file for further analysis
+# Feature Engineering
 
 
-**Identifying Fraudulent Medicare Data**
+<img width="270" alt="feature Engineering" src="https://github.com/juvi-coder/Fraudulent-_Medicare_Claimns/assets/100660932/4e3508e8-b5be-4707-97b1-c1aec0b7b92b">
 
 
- In this phase, I am merging the Fraudulent Providers Data with the Claims Data using the "NPI" Column as the key for joining.
+The whole point of feature engineering is to capture the abnormal behavior that an medicare provider may commit. After an literature study, I found that these are important variables in the data set that can capture abnormalities.
 
-The 'J' Anchor of the Join tool in Alteryx outputs records that successfully matched from both the 'L' (Left) and 'R' (Right) inputs. These represent the fraudulent claims.
+Using the variables
+ 
+Average Medicare Amount Allowed: 
+Average of the Medicare allowed amount for the service; this figure is the sum of the amount Medicare pays, the deductible and coinsurance amounts that the beneficiary is responsible for paying, and any amounts that a third party is responsible for paying.
 
-The 'R' Anchor outputs records from the 'R' input that didn't find a match in the 'L' input, signifying non-fraudulent claims.
+Average Medicare Payment Amount:	Average amount that Medicare paid after deductible and coinsurance amounts have been deducted for the line item service.
 
-I'm employing the Formula tool to create a new column named 'Fraud_Label'. Data stemming from the 'J' Anchor is assigned a label of 1 (indicating fraud), while data from the 'R' Anchor is assigned a label of 0 (indicating non-fraud).
+Average Submitted Charge Amount:	Average of the charges that the provider submitted for the service.
 
-Next, I use the Union tool to combine both sets of labeled data. This is followed by removing any duplicate rows that may have been created due to the join operation.
+Number of Medicare Beneficiary/Day Services	Number of distinct Medicare beneficiary/per day services.
 
-In my dataset, multiple claims are associated with the same provider. However, for my analysis, I only require a single row per provider. To achieve this, I'm selecting unique rows based on the combination of 'NPI' and 'HCPCS' codes.
+**I created the following features:**
 
-**I have attached my presentation deck, altreyx flows, Tableau BI Solution and Python code for the problem.**
+**total_amount_claimed**
+[Number of Medicare Beneficiary/Day Services]*[Average Submitted Charge Amount]
+This captures the total amount of money charged by the provider for all the services that were performed and submitted for claim.
+
+**Total_amount_recevied**
+[Number of Medicare Beneficiary/Day Services]*[Average Medicare Payment Amount]
+This captures the total average amount received by the provider that medicare paid after deductible  and coinsurance amounts.
+
+**total_amount_allowed**
+[Number of Medicare Beneficiary/Day Services]*[Average Medicare Allowed Amount]
+This captures the total average amount approved and covered by Medicare for the service.
+
+**Using the above features I again created the below features:**
+
+**final_amount_recevied**
+[total_amount_claimed]-[Total_amount_recevied]
+This captures the total amount recevied by the medicare provider after the copayment and dedcutiable payed by the patient
+
+**excess_amount_claimed**
+[total_amount_claimed]-[total_amount_allowed]
+This captures the excess amount claimed to the approved medicare costs 
+
+**payout_ratio****
+
+[Average Medicare Payment Amount]/[Average Submitted Charge Amount]
+This feature captures the total of average amount paid by the medicare to the total average cost of services for a claim by provider
+
+
+**allowance_ratio**
+[Average Medicare Allowed Amount]/[Average Submitted Charge Amount]
+This captures average  deviation in the amount approved by medicare and the total amount charged by the provider. 
+
+
+
+
+# Final Data Modeling Workflow for EDA
+<img width="378" alt="EDA" src="https://github.com/juvi-coder/Fraudulent-_Medicare_Claimns/assets/100660932/d298c77e-2fa3-489a-b683-6c1aa4c48017">
+
+
+In this stage, I am grouping data by NPI Code, Gender, Provider Type, and Fraud Label to consolidate all data related to each unique provider.
+
+The final features for model construction, derived from multiple claim rows per provider, are as follows:
+
+Count of HCPCS Code: This reflects the diversity of services provided by each provider. Larger providers may offer a variety of services, while smaller ones might only provide a few. This feature could highlight abnormalities in the model, such as smaller providers attempting to claim large amounts.
+
+Average of Payout Ratio: This measures the average ratio of the amount paid by Medicare to the amount charged by the provider. It can help identify abnormalities.
+
+Average of Allowance Ratio: This feature represents the average ratio of the amount approved by Medicare to the amount charged by the provider.
+
+Average of Final_amount_received: This captures the average amount received by the provider from Medicare. It can highlight anomalies such as unusually high or low reimbursement rates.
+
+Average of Excess_amount_claimed: This measures the average excess amount claimed by the provider, which can help in detecting abnormalities.
+
+Average of Medicare Beneficiary/Day Services: This captures the average number of patients a single provider serves per day. Abnormally high values could suggest fraudulent activity.
+
+Sum of Total_Amount_Claimed
+
+Sum of Total_amount_received
+
+Sum of Total_amount_allowed
+
+The above features will assist in the development of a model aimed at identifying fraudulent Medicare claims. By effectively distinguishing between normal and abnormal provider behavior, this model can help ensure Medicare funds are used appropriately and efficiently.
+
+
+# Final Modelling Workflow
+<img width="956" alt="Modelling Workflow" src="https://github.com/juvi-coder/Fraudulent-_Medicare_Claimns/assets/100660932/fc2906f4-6649-45d9-8072-b0ec962c85f3">
+
+
+
+## Modeling Results
+
+<img width="511" alt="Comparison Report" src="https://github.com/juvi-coder/Fraudulent-_Medicare_Claimns/assets/100660932/56090f4e-11b9-444c-aea3-173122e37b12">
+
+
+# T Tests, CHI Square are present in the presentation Deck
+
+# I have attached my presentation deck, altreyx flows, Tableau BI Solution and Python code for the problem.
