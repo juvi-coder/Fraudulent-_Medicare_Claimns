@@ -30,4 +30,4 @@ The Office of the Inspector General provides a dataset of List of Excluded Indiv
 
 **Using the above two datasets, levraging the power of Altreyx, Tableau and Python**, **I have built an Gradient Boosted Model, with 76% Accuracy and 71% AUC Scores.**
 
-**I have attached my presentation deck, altreyx flows, Tableau BI Solution and Python code for the problem. **
+**I have attached my presentation deck, altreyx flows, Tableau BI Solution and Python code for the problem.**
