@@ -28,6 +28,6 @@ CMS has released  datasets, including the Medicare Provider Utilization and Paym
 
 The Office of the Inspector General provides a dataset of List of Excluded Individuals and Entities (LEIE), signifying fraudulent providers.
 
-**Using the above two datasets, levraging the power of Altreyx, Tableau and Python, **I have built an Gradient Boosted Model, with 76% Accuracy and 71% AUC Scores.**
+**Using the above two datasets, levraging the power of Altreyx, Tableau and Python**, **I have built an Gradient Boosted Model, with 76% Accuracy and 71% AUC Scores.**
 
-**I have attached my presentation deck, altreyx flows, Tableau BI Solution and Python code for the problem. ****
+**I have attached my presentation deck, altreyx flows, Tableau BI Solution and Python code for the problem. **
