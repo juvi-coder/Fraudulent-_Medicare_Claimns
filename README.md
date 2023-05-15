@@ -1,4 +1,4 @@
-# Fraudulent-_Medicare_Claimns
+# Fraudulent-_Medicare_Claims
 By leveraging data analysis and machine learning, we can proactively identify potential medicare fraud cases, thus preserving resources for those truly in need.
 
 
