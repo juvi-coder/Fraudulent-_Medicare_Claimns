@@ -9,8 +9,7 @@ Healthcare fraud is a persistent issue in the US, with certain providers exploit
 Despite efforts by the Centers for Medicare and Medicaid Services (CMS) to minimize fraudulent activities, identifying patterns of fraudulent claims remains a challenge.
 
 # Objective
-Our goal is to examine patterns of fraudulent claims activity in the CMS Medicare dataset, using the list of fraudulent providers from LEIE.
-We aim to identify specific features distinguishing fraudulent physicians from non-fraudulent ones and develop a classifier model for fraud detection.
+My goal is to examine patterns of fraudulent claims activity in the CMS Medicare dataset, using the list of fraudulent providers from LEIE. I aim to build specific features from existing data to  develop a classifier model for fraud detection.
 
 # Significance
 Addressing healthcare fraud is vital for the equitable distribution of Medicare resources, ensuring maximum reach and effectiveness of the program.
