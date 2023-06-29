@@ -5,18 +5,18 @@ By leveraging data analysis and machine learning, we can proactively identify po
 # Healthcare Fraud: An Unseen Epidemic Impacting Medicare's Effectiveness
 
 # Problem Statement
-Healthcare fraud is a persistent issue in the US, with certain providers exploiting Medicare for personal gain. This problem limits Medicare's capacity to serve the healthcare needs of elderly and other qualifying individuals effectively.
+Healthcare fraud is a persistent issue in the US, with certain providers exploiting Medicare for personal gain. This problem limits Medicare's capacity to serve the healthcare needs of the elderly and other qualifying individuals effectively.
 Despite efforts by the Centers for Medicare and Medicaid Services (CMS) to minimize fraudulent activities, identifying patterns of fraudulent claims remains a challenge.
 
 # Objective
-My goal is to examine patterns of fraudulent claims activity in the CMS Medicare dataset, using the list of fraudulent providers from LEIE. I aim to build specific features from existing data to  develop a classifier model for fraud detection.
+My goal is to examine patterns of fraudulent claims activity in the CMS Medicare dataset using the list of fraudulent providers from LEIE. I aim to build specific features from existing data to  develop a classifier model for fraud detection.
 
 # Significance
-Addressing healthcare fraud is vital for the equitable distribution of Medicare resources, ensuring maximum reach and effectiveness of the program.
+Addressing healthcare fraud is vital for the equitable distribution of Medicare resources, ensuring the maximum reach and effectiveness of the program.
 By leveraging data analysis and machine learning, we can proactively identify potential fraud cases, thus preserving resources for those truly in need.
 
 
-Medicare fraud and abuse can occur everywhere, increasing everyone's taxes and health care expenditures. Many instances include: 
+Medicare fraud and abuse can occur everywhere, increasing everyone's taxes and healthcare expenditures. Many instances include: 
 
 A healthcare professional charges Medicare for goods or services you never received, such as billing you for a visit or a back brace you never received. 
 A provider who bills Medicare twice for a good or service you only received once. 
@@ -27,7 +27,7 @@ CMS has released  datasets, including the Medicare Provider Utilization and Paym
 
 The Office of the Inspector General provides a dataset of List of Excluded Individuals and Entities (LEIE), signifying fraudulent providers.
 
-**Using the above two datasets, levraging the power of Altreyx, Tableau and Python**, **I have built an Gradient Boosted Model, with 76% Accuracy and 71% AUC Scores.**
+**Using the above two datasets, leveraging the power of Altreyx, Tableau and Python**, **I have built a Gradient Boosted Model, with 76% Accuracy and 71% AUC Scores.**
 
 # DATA PREP Workflow
 <img width="943" alt="Data Prep Workflow" src="https://github.com/juvi-coder/Fraudulent-_Medicare_Claimns/assets/100660932/3bfc4aff-cd14-42fc-9502-127a4c1ceaf6">
@@ -45,7 +45,7 @@ The Office of the Inspector General provides a dataset of List of Excluded Indiv
 <img width="270" alt="feature Engineering" src="https://github.com/juvi-coder/Fraudulent-_Medicare_Claimns/assets/100660932/4e3508e8-b5be-4707-97b1-c1aec0b7b92b">
 
 
-The whole point of feature engineering is to capture the abnormal behavior that an medicare provider may commit. After an literature study, I found that these are important variables in the data set that can capture abnormalities.
+The whole point of feature engineering is to capture the abnormal behavior that an Medicare provider may commit. After a literature study, I found that these are important variables in the data set that can capture abnormalities.
 
 Using the variables
  
@@ -56,7 +56,7 @@ Average Medicare Payment Amount:	Average amount that Medicare paid after deducti
 
 Average Submitted Charge Amount:	Average of the charges that the provider submitted for the service.
 
-Number of Medicare Beneficiary/Day Services	Number of distinct Medicare beneficiary/per day services.
+Number of Medicare Beneficiary/Day Services	Number of distinct Medicare beneficiaries/per day services.
 
 **I created the following features:**
 
@@ -66,7 +66,7 @@ This captures the total amount of money charged by the provider for all the serv
 
 **Total_amount_recevied**
 [Number of Medicare Beneficiary/Day Services]*[Average Medicare Payment Amount]
-This captures the total average amount received by the provider that medicare paid after deductible  and coinsurance amounts.
+This captures the total average amount received by the provider that Medicare paid after deductible  and coinsurance amounts.
 
 **total_amount_allowed**
 [Number of Medicare Beneficiary/Day Services]*[Average Medicare Allowed Amount]
@@ -76,7 +76,7 @@ This captures the total average amount approved and covered by Medicare for the 
 
 **final_amount_recevied**
 [total_amount_claimed]-[Total_amount_recevied]
-This captures the total amount recevied by the medicare provider after the copayment and dedcutiable payed by the patient
+This captures the total amount received by the Medicare provider,by the patient copayment and deductible paid 
 
 **excess_amount_claimed**
 [total_amount_claimed]-[total_amount_allowed]
@@ -121,7 +121,7 @@ Sum of Total_amount_received
 
 Sum of Total_amount_allowed
 
-The above features will assist in the development of a model aimed at identifying fraudulent Medicare claims. By effectively distinguishing between normal and abnormal provider behavior, this model can help ensure Medicare funds are used appropriately and efficiently.
+The above features will assist in developing a model to identify fraudulent Medicare claims. By effectively distinguishing between normal and abnormal provider behavior, this model can help ensure Medicare funds are used appropriately and efficiently.
 
 
 # Final Modelling Workflow
