@@ -76,7 +76,7 @@ This captures the total average amount approved and covered by Medicare for the 
 
 **final_amount_recevied**
 [total_amount_claimed]-[Total_amount_recevied]
-This captures the total amount received by the Medicare provider,by the patient copayment and deductible paid 
+This captures the total amount received by the Medicare provider from the patient for copayment and deductible paids.
 
 **excess_amount_claimed**
 [total_amount_claimed]-[total_amount_allowed]
