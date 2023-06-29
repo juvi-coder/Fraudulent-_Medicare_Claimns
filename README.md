@@ -49,12 +49,12 @@ The whole point of feature engineering is to capture the abnormal behavior that 
 
 Using the variables
  
-Average Medicare Amount Allowed: 
+**Average Medicare Amount Allowed:** 
 Average of the Medicare allowed amount for the service; this figure is the sum of the amount Medicare pays, the deductible and coinsurance amounts that the beneficiary is responsible for paying, and any amounts that a third party is responsible for paying.
 
-Average Medicare Payment Amount:	Average amount that Medicare paid after deductible and coinsurance amounts have been deducted for the line item service.
+**Average Medicare Payment Amount:**	Average amount that Medicare paid after deductible and coinsurance amounts have been deducted for the line item service.
 
-Average Submitted Charge Amount:	Average of the charges that the provider submitted for the service.
+**Average Submitted Charge Amount:**	Average of the charges that the provider submitted for the service.
 
 Number of Medicare Beneficiary/Day Services	Number of distinct Medicare beneficiaries/per day services.
 
