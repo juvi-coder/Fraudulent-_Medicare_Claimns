@@ -109,7 +109,7 @@ Average of Payout Ratio: This measures the average ratio of the amount paid by M
 
 Average of Allowance Ratio: This feature represents the average ratio of the amount approved by Medicare to the amount charged by the provider.
 
-Average of Final_amount_received: This captures the average amount received by the provider from Medicare. It can highlight anomalies such as unusually high or low reimbursement rates.
+Average of Final_amount_received: This captures the average amount received by the provider from the patient.
 
 Average of Excess_amount_claimed: This measures the average excess amount claimed by the provider, which can help in detecting abnormalities.
 
